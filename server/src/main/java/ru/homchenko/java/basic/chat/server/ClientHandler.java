@@ -19,6 +19,10 @@ public class ClientHandler {
         this.username = "user" + usersCounter;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public ClientHandler(Server server, Socket socket) throws IOException {
         this.server = server;
         this.socket = socket;
@@ -27,17 +31,25 @@ public class ClientHandler {
         this.generateUserName();
         new Thread(() -> {
             try {
-                System.out.println("Подключился новый клиент");
+                //System.out.println("Подключился новый клиент");
+                String name = in.readUTF();
+                if (name != null)
+                    this.username = name;
+                System.out.println("Подключился новый клиент: " + this.username);
+
                 while (true) {
                     String msg = in.readUTF();
-                    if (msg.startsWith("/")) {
-                        if (msg.startsWith("/exit")) {
-                            disconnect();
-                            break;
-                        }
-                        continue;
+
+                    if (msg.startsWith("/w ")) {
+                        server.sendMessageSelectedUser(msg);
+                    } else {
+                        server.broadcastMessage(username + ": " + msg);
                     }
-                    server.broadcastMessage(username + ": " + msg);
+
+                    if (msg.startsWith("/exit")) {
+                        disconnect();
+                        break;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
