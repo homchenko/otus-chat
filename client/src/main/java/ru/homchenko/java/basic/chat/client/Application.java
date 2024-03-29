@@ -25,6 +25,11 @@ public class Application {
                     e.printStackTrace();
                 }
             }).start();
+
+            System.out.println("Введите свое имя: ");
+            String name = scanner.nextLine();
+            out.writeUTF(name);
+
             while (true) {
                 String msg = scanner.nextLine();
                 out.writeUTF(msg);

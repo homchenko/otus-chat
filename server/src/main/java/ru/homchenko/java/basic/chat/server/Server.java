@@ -41,4 +41,18 @@ public class Server {
             client.sendMessage(message);
         }
     }
+
+    public synchronized void sendMessageSelectedUser(String msg) {
+        int spaceIdx1 = msg.indexOf(" ");
+        String subStr = msg.substring(spaceIdx1 + 1);
+        int spaceIdx2 = subStr.indexOf(" ");
+        String userName = subStr.substring(0, spaceIdx2);
+
+        for (ClientHandler client : clients) {
+            if (client.getUsername().equals(userName)) {
+                client.sendMessage(msg);
+                break;
+            }
+        }
+    }
 }
