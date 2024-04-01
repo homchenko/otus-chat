@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Server {
     private int port;
@@ -48,9 +50,14 @@ public class Server {
         int spaceIdx2 = subStr.indexOf(" ");
         String userName = subStr.substring(0, spaceIdx2);
 
+        Map<String, ClientHandler> usersMap = new HashMap<>();
         for (ClientHandler client : clients) {
-            if (client.getUsername().equals(userName)) {
-                client.sendMessage(msg);
+            usersMap.put(client.getUsername(), client);
+        }
+
+        for (Map.Entry<String, ClientHandler> entry : usersMap.entrySet()) {
+            if (entry.getKey().equals(userName)) {
+                entry.getValue().sendMessage(msg);
                 break;
             }
         }
