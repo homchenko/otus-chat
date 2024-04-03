@@ -4,11 +4,19 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Server {
     private int port;
     private List<ClientHandler> clients;
+
+    private AuthenticationService authenticationService;
+
+    public AuthenticationService getAuthenticationService() {
+        return authenticationService;
+    }
 
     public Server(int port) {
         this.port = port;
@@ -16,12 +24,17 @@ public class Server {
     }
 
     public void start() {
-        try (ServerSocket serverSocket = new ServerSocket(this.port)) {
-            System.out.printf("Сервер запущен на порте: %d, ожидаем подключения клиентов\n", this.port);
-
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            this.authenticationService = new InMemoryAuthenticationService();
+            System.out.println("Сервис аутентификации запущен: " + authenticationService.getClass().getSimpleName());
+            System.out.printf("Сервер запущен на порту: %d, ожидаем подключения клиентов\n", port);
             while (true) {
-                Socket socket = serverSocket.accept();
-                this.subscribe(new ClientHandler(this, socket));
+                try {
+                    Socket socket = serverSocket.accept();
+                    new ClientHandler(this, socket);
+                } catch (Exception e) {
+                    System.out.println("Возникла ошибка при обработке подключившегося клиента");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,16 +56,28 @@ public class Server {
     }
 
     public synchronized void sendMessageSelectedUser(String msg) {
-        int spaceIdx1 = msg.indexOf(" ");
-        String subStr = msg.substring(spaceIdx1 + 1);
-        int spaceIdx2 = subStr.indexOf(" ");
-        String userName = subStr.substring(0, spaceIdx2);
+        String[] tokens = msg.split(" ");
+        String nickname = tokens[1];
 
+        Map<String, ClientHandler> usersMap = new HashMap<>();
         for (ClientHandler client : clients) {
-            if (client.getUsername().equals(userName)) {
-                client.sendMessage(msg);
+            usersMap.put(client.getNickname(), client);
+        }
+
+        for (Map.Entry<String, ClientHandler> entry : usersMap.entrySet()) {
+            if (entry.getKey().equals(nickname)) {
+                entry.getValue().sendMessage(msg);
                 break;
             }
         }
+    }
+
+    public synchronized boolean isNicknameBusy(String nickname) {
+        for (ClientHandler c : clients) {
+            if (c.getNickname().equals(nickname)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
