@@ -82,16 +82,20 @@ public class Server {
     }
 
     public synchronized void kickUser(String msg, String role) {
+        if (role == null)
+            return;
+
         if (role.equals("ADMIN")) {
             String[] tokens = msg.split(" ");
             String nickname = tokens[1];
 
             for (ClientHandler c : clients) {
+                if (c.getRole().equals(role))
+                    return;
+
                 if (c.getNickname().equals(nickname)) {
                     c.disconnect();
-                    System.out.println(nickname + "отключен");
-                } else {
-                    System.out.println("Пользователь с именем " + nickname + " не найден");
+                    System.out.println(nickname + " отключен");
                 }
             }
         }
