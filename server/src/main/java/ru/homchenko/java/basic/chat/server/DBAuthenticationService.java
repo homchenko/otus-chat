@@ -22,7 +22,6 @@ public class DBAuthenticationService implements AuthenticationService {
     private List<DBAuthenticationService.User> users;
     private static final String DATABASE_URL = "jdbc:postgresql://localhost:5432/postgres";
     private static final String USERS_QUERY = "select u.nickname, u.email, u.\"password\", r.\"name\"  from users u join user_to_role utr on u.id = utr.user_id join roles r on utr.role_id = r.id ";
-    //private static final String USER_ROLES_QUERY = "select r.id as id, r.name as name from user_to_role ur left join roles r ON r.id=ur.role_id where ur.user_id = ?";
 
     public DBAuthenticationService() {
         this.users = new ArrayList<>();
