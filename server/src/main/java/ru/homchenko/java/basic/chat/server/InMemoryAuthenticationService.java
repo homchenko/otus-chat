@@ -29,6 +29,11 @@ public class InMemoryAuthenticationService implements AuthenticationService {
     }
 
     @Override
+    public void getUsersListFromDB() {
+        //
+    }
+
+    @Override
     public String getNicknameByLoginAndPassword(String login, String password) {
         for (User u : users) {
             if (u.login.equals(login) && u.password.equals(password)) {
