@@ -8,11 +8,13 @@ public class InMemoryAuthenticationService implements AuthenticationService {
         private String login;
         private String password;
         private String nickname;
+        private String role;
 
-        public User(String login, String password, String nickname) {
+        public User(String login, String password, String nickname, String role) {
             this.login = login;
             this.password = password;
             this.nickname = nickname;
+            this.role = role;
         }
     }
 
@@ -21,8 +23,9 @@ public class InMemoryAuthenticationService implements AuthenticationService {
     public InMemoryAuthenticationService() {
         this.users = new ArrayList<>();
         for (int i = 1; i <= 10; i++) {
-            this.users.add(new User("login" + i, "pass" + i, "nick" + i));
+            this.users.add(new User("login" + i, "pass" + i, "nick" + i, "USER"));
         }
+        this.users.add(new User("admin", "admin", "admin", "ADMIN"));
     }
 
     @Override
@@ -43,7 +46,7 @@ public class InMemoryAuthenticationService implements AuthenticationService {
         if (isNicknameAlreadyExist(nickname)) {
             return false;
         }
-        users.add(new User(login, password, nickname));
+        users.add(new User(login, password, nickname, "USER"));
         return true;
     }
 
@@ -65,6 +68,16 @@ public class InMemoryAuthenticationService implements AuthenticationService {
             }
         }
         return false;
+    }
+
+    @Override
+    public String getUserRoleByLoginAndPassword(String login, String password) {
+        for (User u : users) {
+            if (u.login.equals(login) && u.password.equals(password)) {
+                return u.role;
+            }
+        }
+        return null;
     }
 }
 

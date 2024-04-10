@@ -80,4 +80,24 @@ public class Server {
         }
         return false;
     }
+
+    public synchronized void kickUser(String msg, String role) {
+        if (role == null)
+            return;
+
+        if (role.equals("ADMIN")) {
+            String[] tokens = msg.split(" ");
+            String nickname = tokens[1];
+
+            for (ClientHandler c : clients) {
+                if (c.getRole().equals(role))
+                    return;
+
+                if (c.getNickname().equals(nickname)) {
+                    c.disconnect();
+                    System.out.println(nickname + " отключен");
+                }
+            }
+        }
+    }
 }

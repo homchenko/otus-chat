@@ -11,9 +11,14 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String nickname;
+    private String role;
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public ClientHandler(Server server, Socket socket) throws IOException {
@@ -46,6 +51,10 @@ public class ClientHandler {
                 if (msg.startsWith("/w ")) {
                     server.sendMessageSelectedUser(msg);
                 }
+                if (msg.startsWith("/kick "))
+                {
+                    server.kickUser(msg, role);
+                }
                 continue;
             }
             server.broadcastMessage(nickname + ": " + msg);
@@ -73,6 +82,7 @@ public class ClientHandler {
                     continue;
                 }
                 this.nickname = nickname;
+                this.role = server.getAuthenticationService().getUserRoleByLoginAndPassword(login, password);
                 server.subscribe(this);
                 sendMessage(nickname + ", добро пожаловать в чат!");
                 return true;
