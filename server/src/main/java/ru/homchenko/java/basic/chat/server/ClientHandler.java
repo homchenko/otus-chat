@@ -51,8 +51,7 @@ public class ClientHandler {
                 if (msg.startsWith("/w ")) {
                     server.sendMessageSelectedUser(msg);
                 }
-                if (msg.startsWith("/kick "))
-                {
+                if (msg.startsWith("/kick ")) {
                     server.kickUser(msg, role);
                 }
                 continue;
